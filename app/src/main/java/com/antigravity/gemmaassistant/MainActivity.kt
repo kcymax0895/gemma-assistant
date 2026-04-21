@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 )
             ) {
                 val uiState by viewModel.uiState.collectAsState()
-                var currentScreen by remember { mutableStateOf("translator") }
+                var currentScreen by remember { mutableStateOf("assistant") }
 
                 LaunchedEffect(Unit) {
                     if (!uiState.isModelLoaded && uiState.downloadedModels.isEmpty()) {

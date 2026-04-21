@@ -7,14 +7,14 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     env:
-      # Gradle 빌드 JVM 메모리 설정 (gradlew 파싱 문제 우회)
       JAVA_TOOL_OPTIONS: "-Xmx4g -Xms1g"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g"
 
@@ -35,7 +35,21 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        id: build
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace > build_error.log 2>&1 || (cat build_error.log; exit 1)
+
+      - name: Push Error Log
+        if: failure()
+        run: |
+          git config --global user.name "AutoLog"
+          git config --global user.email "autolog@github.com"
+          git fetch
+          git checkout -B error-logs
+          cp build_error.log error.txt
+          git add error.txt
+          git commit -m "Add error log"
+          git push -f origin error-logs
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
