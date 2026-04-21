@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
                                         onClick = { currentScreen = "translator" }
                                     )
                                     NavigationBarItem(
-                                        icon = { Icon(androidx.compose.material.icons.Icons.Default.Done, contentDescription = null) },
+                                        icon = { Icon(androidx.compose.material.icons.Icons.Default.SmartToy, contentDescription = null) },
                                         label = { Text("비서") },
                                         selected = currentScreen == "assistant",
                                         onClick = { currentScreen = "assistant" }
