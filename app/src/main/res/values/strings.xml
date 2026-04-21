@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gemma 비서</string>
+    <string name="start_listening">녹음 시작</string>
+    <string name="stop_listening">녹음 중지</string>
+    <string name="translate">번역</string>
+    <string name="model_not_loaded">모델 미로드</string>
+    <string name="model_loaded">AI 준비됨</string>
+    <string name="source_text_hint">녹음 버튼을 눌러 시작하세요</string>
+    <string name="translated_text_hint">번역 결과가 여기에 표시됩니다</string>
+    <string name="settings">설정</string>
+    <string name="model_path_label">모델 파일 경로</string>
+    <string name="load_model">모델 로드</string>
+</resources>
