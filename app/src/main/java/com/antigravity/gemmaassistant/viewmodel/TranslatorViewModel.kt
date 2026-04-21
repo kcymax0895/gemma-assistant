@@ -181,7 +181,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     fun startListening() {
         if (_uiState.value.isListening) return
         _uiState.value = _uiState.value.copy(
-            isListening = true, sourceText = "", translatedText = "", errorMessage = null
+            isListening = true, sourceText = "", translatedText = "", assistantSummarizedText = "", errorMessage = null
         )
         lastFinalText = ""
 
@@ -274,7 +274,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
             return
         }
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "최근 SMS 읽는 중...")
+            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "최근 SMS 읽는 중...", sourceText = "문자 메시지(SMS) 내역 분석중...", translatedText = "")
             val messages = dataExtractor.getRecentSms(limit = 10)
             if (messages.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isSummarizing = false, assistantSummarizedText = "가져올 문자 메시지가 없습니다.")
@@ -307,7 +307,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
             return
         }
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "파일 읽는 중...")
+            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "파일 읽는 중...", sourceText = "파일 첨부 및 읽기 중...", translatedText = "")
             val fileContent = dataExtractor.readTextFile(uri)
             if (fileContent.isBlank()) {
                 _uiState.value = _uiState.value.copy(isSummarizing = false, assistantSummarizedText = "파일 내용이 비어있거나 읽을 수 없습니다.")

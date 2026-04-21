@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.antigravity.gemmaassistant.ui.ModelDownloadScreen
-import com.antigravity.gemmaassistant.ui.TranslatorScreen
+import com.antigravity.gemmaassistant.ui.AssistantScreen
 import com.antigravity.gemmaassistant.viewmodel.TranslatorViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -68,9 +68,9 @@ class MainActivity : ComponentActivity() {
                         onCancelDownload = { model -> viewModel.cancelModelDownload(model) },
                         onUseModel = { model ->
                             viewModel.useDownloadedModel(model)
-                            currentScreen = "translator"
+                            currentScreen = "assistant"
                         },
-                        onBack = { currentScreen = "translator" }
+                        onBack = { currentScreen = "assistant" }
                     )
                 } else {
                     if (!micPermission.status.isGranted) {
@@ -111,8 +111,8 @@ class MainActivity : ComponentActivity() {
                             }
                         ) { innerPadding ->
                             Box(modifier = Modifier.padding(innerPadding)) {
-                                if (currentScreen == "translator") {
-                                    TranslatorScreen(
+                                if (currentScreen == "assistant") {
+                                    AssistantScreen(
                                         uiState = uiState,
                                         onStartListening  = { viewModel.startListening() },
                                         onStopListening   = { viewModel.stopListening() },
@@ -120,13 +120,9 @@ class MainActivity : ComponentActivity() {
                                         onSourceLangChange = { viewModel.setSourceLang(it) },
                                         onTargetLangChange = { viewModel.setTargetLang(it) },
                                         onNavigateToSetup  = { currentScreen = "download" },
-                                        onClearError       = { viewModel.clearError() }
-                                    )
-                                } else if (currentScreen == "assistant") {
-                                    com.antigravity.gemmaassistant.ui.AssistantScreen(
-                                        uiState = uiState,
-                                        onSummarizeSms = { viewModel.summarizeSms() },
-                                        onSummarizeFile = { uri -> viewModel.summarizeFile(uri) }
+                                        onClearError       = { viewModel.clearError() },
+                                        onSummarizeSms     = { viewModel.summarizeSms() },
+                                        onSummarizeFile    = { uri -> viewModel.summarizeFile(uri) }
                                     )
                                 }
                             }
