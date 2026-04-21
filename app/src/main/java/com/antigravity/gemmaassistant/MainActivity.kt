@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -93,16 +96,16 @@ class MainActivity : ComponentActivity() {
                                     contentColor = Color(0xFF58A6FF)
                                 ) {
                                     NavigationBarItem(
-                                        icon = { Icon(androidx.compose.material.icons.Icons.Default.Edit, contentDescription = null) },
-                                        label = { Text("통역") },
-                                        selected = currentScreen == "translator",
-                                        onClick = { currentScreen = "translator" }
-                                    )
-                                    NavigationBarItem(
-                                        icon = { Icon(androidx.compose.material.icons.Icons.Default.Star, contentDescription = null) },
+                                        icon = { Icon(Icons.Filled.Chat, contentDescription = null) },
                                         label = { Text("비서") },
                                         selected = currentScreen == "assistant",
                                         onClick = { currentScreen = "assistant" }
+                                    )
+                                    NavigationBarItem(
+                                        icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
+                                        label = { Text("설정") },
+                                        selected = currentScreen == "download",
+                                        onClick = { currentScreen = "download" }
                                     )
                                 }
                             }
