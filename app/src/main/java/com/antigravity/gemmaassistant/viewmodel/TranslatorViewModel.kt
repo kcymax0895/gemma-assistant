@@ -275,7 +275,8 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
         }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "최근 SMS 읽는 중...", sourceText = "문자 메시지(SMS) 내역 분석중...", translatedText = "")
-            val messages = dataExtractor.getRecentSms(limit = 10)
+            // 메시지 개수를 5개로 줄여서 입력 컨텍스트 길이 확보 (할루시네이션/크래시 방지)
+            val messages = dataExtractor.getRecentSms(limit = 5)
             if (messages.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isSummarizing = false, assistantSummarizedText = "가져올 문자 메시지가 없습니다.")
                 return@launch
@@ -283,7 +284,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
             // 형식 제작
             val sb = java.lang.StringBuilder()
             messages.forEach { msg ->
-                sb.append("발신자: ${msg.sender}\n내용: ${msg.body.take(150)}\n---\n")
+                sb.append("Sender: ${msg.sender}\nBody: ${msg.body.take(100)}\n---\n")
             }
             
             _uiState.value = _uiState.value.copy(assistantSummarizedText = "문구 추출 완료. Gemma 분석 중...")
@@ -317,7 +318,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
             _uiState.value = _uiState.value.copy(assistantSummarizedText = "해당 파일 내용 추출 완료. Gemma 분석 중...")
             
             val result = gemmaTranslator.summarize(
-                text = fileContent.take(3000), // 최대 3000자 제한
+                text = fileContent.take(800), // 네이티브 C++ 백엔드 OOM 방지를 위해 800자로 엄격히 제한
                 onPartialResult = { partial ->
                     _uiState.value = _uiState.value.copy(assistantSummarizedText = partial)
                 }

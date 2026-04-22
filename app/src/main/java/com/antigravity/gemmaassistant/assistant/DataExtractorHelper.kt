@@ -48,12 +48,18 @@ class DataExtractorHelper(private val context: Context) {
         return@withContext messages
     }
 
-    /** 파일을 읽어 내용을 반환합니다. (SAF Uri 사용을 권장하지만 파일 경로나 Uri 모두 호환되도록 처리) */
+    /** 파일을 읽어 내용을 부분적으로 반환합니다. 앱 강제 종료를 막기 위해 최대 크기를 제한합니다. */
     suspend fun readTextFile(uri: Uri): String = withContext(Dispatchers.IO) {
         try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val text = inputStream?.bufferedReader()?.use { it.readText() }
-            return@withContext text ?: ""
+            var text = ""
+            context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+                val buffer = CharArray(1000)
+                val readCount = reader.read(buffer)
+                if (readCount > 0) {
+                    text = String(buffer, 0, readCount)
+                }
+            }
+            return@withContext text
         } catch (e: Exception) {
             e.printStackTrace()
             return@withContext "파일 읽기 실패: ${e.message}"

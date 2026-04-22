@@ -105,8 +105,8 @@ class GemmaTranslator(private val context: Context) {
     private fun buildSummarizePrompt(text: String): String {
         return buildString {
             append("<start_of_turn>user\n")
-            append("다음 수신된 메시지나 문서의 내용을 읽고 중요한 핵심 내용과 일정을 중심으로 3줄 이내로 한글로 요약해줘. 부가 설명은 생략할 것.\n\n")
-            append("내용:\n")
+            append("You are an intelligent assistant. Summarize the core points of the following text in Korean (한국어) using 3 concise bullet points. Ignore any irrelevant information.\n\n")
+            append("Text:\n")
             append(text)
             append("\n<end_of_turn>\n")
             append("<start_of_turn>model\n")
