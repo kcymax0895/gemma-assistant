@@ -18,17 +18,39 @@ class DataExtractorHelper(private val context: Context) {
      * 최근 N개의 수신된 SMS 메시지를 읽어옵니다. 
      * 긴급 재난 문자 등은 제외할 수 없으나 가장 최신 내역 위주로 가져옵니다.
      */
-    suspend fun getRecentSms(limit: Int = 10): List<SmsMessageData> = withContext(Dispatchers.IO) {
+    suspend fun getRecentSms(limit: Int = 10, senderFilter: String? = null, daysLimit: Int? = null): List<SmsMessageData> = withContext(Dispatchers.IO) {
         val messages = mutableListOf<SmsMessageData>()
         val uri: Uri = Telephony.Sms.Inbox.CONTENT_URI
         val projection = arrayOf(Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE)
+
+        var selection: String? = null
+        var selectionArgs: Array<String>? = null
+        
+        val conditions = mutableListOf<String>()
+        val args = mutableListOf<String>()
+        
+        if (!senderFilter.isNullOrBlank()) {
+            conditions.add("${Telephony.Sms.ADDRESS} LIKE ?")
+            args.add("%$senderFilter%")
+        }
+        
+        if (daysLimit != null) {
+            val timeLimitInMillis = System.currentTimeMillis() - (daysLimit * 24L * 60L * 60L * 1000L)
+            conditions.add("${Telephony.Sms.DATE} >= ?")
+            args.add(timeLimitInMillis.toString())
+        }
+        
+        if (conditions.isNotEmpty()) {
+            selection = conditions.joinToString(" AND ")
+            selectionArgs = args.toTypedArray()
+        }
 
         try {
             context.contentResolver.query(
                 uri,
                 projection,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 "${Telephony.Sms.DATE} DESC LIMIT $limit"
             )?.use { cursor ->
                 val addrIdx = cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)

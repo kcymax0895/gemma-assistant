@@ -52,7 +52,7 @@ fun AssistantScreen(
     onTargetLangChange: (Language) -> Unit,
     onNavigateToSetup: () -> Unit,
     onClearError: () -> Unit,
-    onSummarizeSms: () -> Unit,
+    onSummarizeSms: (String, Int?) -> Unit,
     onSummarizeFile: (android.net.Uri) -> Unit
 ) {
     val smsPermission = rememberPermissionState(android.Manifest.permission.READ_SMS)
@@ -60,6 +60,10 @@ fun AssistantScreen(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> uri?.let { onSummarizeFile(it) } }
     )
+
+    var showSmsDialog by remember { mutableStateOf(false) }
+    var smsSenderFilter by remember { mutableStateOf("") }
+    var smsDaysLimit by remember { mutableStateOf<Int?>(null) }
 
     val pulseAnim = rememberInfiniteTransition(label = "pulse")
     val pulseScale by pulseAnim.animateFloat(
@@ -119,6 +123,12 @@ fun AssistantScreen(
 
                 Spacer(Modifier.height(30.dp))
 
+                Text(
+                    "💡 카카오톡 대화방은 메뉴에서 [대화 내용 내보내기] 후 txt 파일을 첨부하세요.",
+                    color = AccentGreen, fontSize = 11.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+
                 // 액션 버튼류 (SMS/File) - 가로 일렬 배치
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -126,7 +136,7 @@ fun AssistantScreen(
                 ) {
                     Button(
                         onClick = {
-                            if (smsPermission.status.isGranted) onSummarizeSms() else smsPermission.launchPermissionRequest()
+                            if (smsPermission.status.isGranted) showSmsDialog = true else smsPermission.launchPermissionRequest()
                         },
                         modifier = Modifier.weight(1f).height(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)
@@ -203,6 +213,42 @@ fun AssistantScreen(
                 Text(msg, color = TextPrimary)
             }
         }
+    // SMS 옵션 다이얼로그
+    if (showSmsDialog) {
+        AlertDialog(
+            onDismissRequest = { showSmsDialog = false },
+            containerColor = CardSurface,
+            title = { Text("SMS 상세 요약 옵션", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text("요약할 기간 선택", color = TextSecondary, fontSize = 13.sp)
+                    Spacer(Modifier.height(6.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Button(onClick = { smsDaysLimit = 1 }, colors = ButtonDefaults.buttonColors(containerColor = if(smsDaysLimit==1) AccentBlue else DividerColor), contentPadding = PaddingValues(0.dp), modifier = Modifier.weight(1f).height(32.dp)) { Text("오늘", fontSize=12.sp, color=TextPrimary) }
+                        Button(onClick = { smsDaysLimit = 7 }, colors = ButtonDefaults.buttonColors(containerColor = if(smsDaysLimit==7) AccentBlue else DividerColor), contentPadding = PaddingValues(0.dp), modifier = Modifier.weight(1f).height(32.dp)) { Text("1주일", fontSize=12.sp, color=TextPrimary) }
+                        Button(onClick = { smsDaysLimit = 30 }, colors = ButtonDefaults.buttonColors(containerColor = if(smsDaysLimit==30) AccentBlue else DividerColor), contentPadding = PaddingValues(0.dp), modifier = Modifier.weight(1f).height(32.dp)) { Text("1달", fontSize=12.sp, color=TextPrimary) }
+                        Button(onClick = { smsDaysLimit = null }, colors = ButtonDefaults.buttonColors(containerColor = if(smsDaysLimit==null) AccentBlue else DividerColor), contentPadding = PaddingValues(0.dp), modifier = Modifier.weight(1f).height(32.dp)) { Text("전체", fontSize=12.sp, color=TextPrimary) }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    Text("특정 번호/발신자 필터 (선택입력)", color = TextSecondary, fontSize = 13.sp)
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = smsSenderFilter, onValueChange = { smsSenderFilter = it },
+                        placeholder = { Text("예: 0101234, 엄마", fontSize=12.sp) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showSmsDialog = false; onSummarizeSms(smsSenderFilter, smsDaysLimit) }, colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)) {
+                    Text("추출 & 요약", color=Color.White, fontWeight=FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSmsDialog = false }) { Text("취소", color = TextSecondary) }
+            }
+        )
     }
 }
 

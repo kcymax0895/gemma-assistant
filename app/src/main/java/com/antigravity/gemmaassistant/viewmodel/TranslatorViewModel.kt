@@ -268,15 +268,15 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     // ──────────────────────────── AI 비서 (요약) ────────────────────────────
 
-    fun summarizeSms() {
+    fun summarizeSms(senderFilter: String? = null, daysLimit: Int? = null) {
         if (!gemmaTranslator.isReady()) {
             _uiState.value = _uiState.value.copy(errorMessage = "모델이 초기화되지 않았습니다.")
             return
         }
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "최근 SMS 읽는 중...", sourceText = "문자 메시지(SMS) 내역 분석중...", translatedText = "")
-            // 메시지 개수를 5개로 줄여서 입력 컨텍스트 길이 확보 (할루시네이션/크래시 방지)
-            val messages = dataExtractor.getRecentSms(limit = 5)
+            _uiState.value = _uiState.value.copy(isSummarizing = true, assistantSummarizedText = "조건에 맞는 최근 SMS 탐색 중...", sourceText = "문자 메시지(SMS) 내역 분석중...", translatedText = "")
+            // 최대 10개를 가져와 요약 문맥에 넘깁니다
+            val messages = dataExtractor.getRecentSms(limit = 10, senderFilter = senderFilter, daysLimit = daysLimit)
             if (messages.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isSummarizing = false, assistantSummarizedText = "가져올 문자 메시지가 없습니다.")
                 return@launch

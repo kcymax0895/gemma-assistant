@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
                                         onTargetLangChange = { viewModel.setTargetLang(it) },
                                         onNavigateToSetup  = { currentScreen = "download" },
                                         onClearError       = { viewModel.clearError() },
-                                        onSummarizeSms     = { viewModel.summarizeSms() },
+                                        onSummarizeSms     = { sender, days -> viewModel.summarizeSms(sender, days) },
                                         onSummarizeFile    = { uri -> viewModel.summarizeFile(uri) }
                                     )
                                 }
