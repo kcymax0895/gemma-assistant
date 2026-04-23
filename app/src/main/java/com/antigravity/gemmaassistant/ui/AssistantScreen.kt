@@ -251,6 +251,7 @@ fun AssistantScreen(
         )
     }
 }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
