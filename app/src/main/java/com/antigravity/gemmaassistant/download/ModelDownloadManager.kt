@@ -76,7 +76,7 @@ class ModelDownloadManager(private val context: Context) {
         val request = DownloadManager.Request(Uri.parse(url)).apply {
             setTitle("${model.displayName} 다운로드")
             setDescription("Gemma 비서 앱 AI 모델 (${model.sizeText})")
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, model.fileName)
+            setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, model.fileName)
             setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
             )
@@ -122,7 +122,7 @@ class ModelDownloadManager(private val context: Context) {
 
     /** 다운로드된 모델의 실제 기기 경로를 반환합니다. */
     fun getModelPath(model: GemmaModel): String {
-        return "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/${model.fileName}"
+        return "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${model.fileName}"
     }
 
     /** 모델 파일이 이미 기기에 존재하는지 확인합니다. */
