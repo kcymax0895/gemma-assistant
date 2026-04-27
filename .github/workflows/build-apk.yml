@@ -64,6 +64,6 @@ jobs:
           git fetch
           git checkout -B release-ytdubber
           cp app/build/outputs/apk/debug/app-debug.apk YtDubber.apk
-          git add YtDubber.apk
+          git add -f YtDubber.apk
           git commit -m "Upload YtDubber APK directly" || echo "No changes"
           git push -f origin release-ytdubber
