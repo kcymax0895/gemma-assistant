@@ -25,43 +25,61 @@ class SubtitleExtractor {
             var playerResponseJsonStr = ""
             for (script in scripts) {
                 val data = script.data()
-                if (data.contains("ytInitialPlayerResponse = ")) {
-                    val startIdx = data.indexOf("ytInitialPlayerResponse = ") + 26
-                    var endIdx = data.indexOf("};", startIdx) + 1
-                    if (endIdx <= 0) {
-                        endIdx = data.lastIndexOf("}") + 1
+                val startStr = "ytInitialPlayerResponse = "
+                val startIdx = data.indexOf(startStr)
+                if (startIdx >= 0) {
+                    val content = data.substring(startIdx + startStr.length)
+                    var braceCount = 0
+                    var endIdx = -1
+                    for (i in content.indices) {
+                        if (content[i] == '{') braceCount++
+                        else if (content[i] == '}') {
+                            braceCount--
+                            if (braceCount == 0) {
+                                endIdx = i
+                                break
+                            }
+                        }
                     }
-                    if (endIdx > 0) {
-                        playerResponseJsonStr = data.substring(startIdx, endIdx)
+                    if (endIdx != -1) {
+                        playerResponseJsonStr = content.substring(0, endIdx + 1)
                     }
                     break
                 }
             }
 
-            if (playerResponseJsonStr.isEmpty()) throw Exception("자막 정보를 찾을 수 없습니다.")
+            if (playerResponseJsonStr.isEmpty()) throw Exception("자막 정보를 찾을 수 없습니다. (ytInitialPlayerResponse 파싱 실패)")
 
             val root = JSONObject(playerResponseJsonStr)
             val captions = root.optJSONObject("captions")
                 ?.optJSONObject("playerCaptionsTracklistRenderer")
-                ?.optJSONArray("captionTracks") ?: throw Exception("해당 영상에 접근 가능한 자막이 없습니다.")
+                ?.optJSONArray("captionTracks")
+
+            if (captions == null || captions.length() == 0) {
+                throw Exception("해당 영상에 자동/수동 자막이 존재하지 않아 더빙할 수 없습니다.")
+            }
 
             var targetTrackUrl = ""
-            var languageCode = "en" // 기본값
-            
+            var languageCode = "en"
+
+            var koTrack: JSONObject? = null
+            var enTrack: JSONObject? = null
+            var asrTrack: JSONObject? = null
+
             for (i in 0 until captions.length()) {
                 val track = captions.getJSONObject(i)
                 val langCode = track.optString("languageCode")
-                if (langCode.startsWith("en") || track.optString("kind") == "asr") {
-                    targetTrackUrl = track.optString("baseUrl")
-                    languageCode = langCode
-                    break
-                }
+                val kind = track.optString("kind")
+                
+                if (langCode.startsWith("ko")) koTrack = track
+                else if (langCode.startsWith("en")) enTrack = track
+                
+                if (kind == "asr") asrTrack = track
             }
-            if (targetTrackUrl.isEmpty() && captions.length() > 0) {
-                val track = captions.getJSONObject(0)
-                targetTrackUrl = track.optString("baseUrl")
-                languageCode = track.optString("languageCode", "en")
-            }
+
+            val selectedTrack = koTrack ?: enTrack ?: asrTrack ?: captions.getJSONObject(0)
+            targetTrackUrl = selectedTrack.optString("baseUrl")
+            languageCode = selectedTrack.optString("languageCode", "en")
 
             targetTrackUrl += "&fmt=json3"
 
