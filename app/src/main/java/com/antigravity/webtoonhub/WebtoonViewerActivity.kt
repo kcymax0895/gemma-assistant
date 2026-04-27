@@ -32,6 +32,7 @@ class WebtoonViewerActivity : ComponentActivity() {
                 useWideViewPort = true
                 loadWithOverviewMode = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                userAgentString = "Mozilla/5.0 (Linux; Android 13; SM-S918N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36"
             }
             loadUrl(targetUrl)
         }
