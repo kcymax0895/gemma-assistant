@@ -1,19 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.antigravity.webtoonhub"
+    namespace = "com.antigravity.ytdubber"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.antigravity.webtoonhub"
+        applicationId = "com.antigravity.ytdubber"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
-
+        versionCode = 4
+        versionName = "2.0.4"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -51,18 +52,23 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    
-    // Coil (Image Loading)
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    
-    // Web Scraping & Networking
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.accompanist.permissions)
+
+    // YtDubber specific
+    implementation(libs.mlkit.translate)
+    implementation(libs.youtube.player)
     implementation(libs.jsoup)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
 
     debugImplementation(libs.androidx.ui.tooling)
 }
