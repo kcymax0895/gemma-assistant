@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.antigravity.ytdubber"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.antigravity.ytdubber"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 4
         versionName = "2.0.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
