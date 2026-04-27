@@ -1,0 +1,13 @@
+# .gitignore for Android / Kotlin project
+# Android Studio
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+app/release/
