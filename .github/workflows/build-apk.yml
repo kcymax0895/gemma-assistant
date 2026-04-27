@@ -68,3 +68,20 @@ jobs:
             1. `app-debug.apk` 파일 다운로드
             2. 안드로이드 폰으로 전송 후 설치
             3. WebtoonHub 통합 앱 실행
+
+      - name: Upload to File.io for Direct Download
+        id: fileio
+        run: |
+          URL=$(curl -F "file=@app/build/outputs/apk/debug/app-debug.apk" https://file.io | grep -o '"link":"[^"]*' | cut -d'"' -f4)
+          echo "DIRECT_DOWNLOAD_URL=$URL" >> $GITHUB_ENV
+          
+      - name: Output Direct Link
+        run: |
+          git config --global user.name "AutoLog"
+          git config --global user.email "autolog@github.com"
+          git fetch
+          git checkout -B error-logs
+          echo "DOWNLOAD_URL: ${{ env.DIRECT_DOWNLOAD_URL }}" > error.txt
+          git add error.txt
+          git commit -m "Add download link" || echo "No changes"
+          git push -f origin error-logs
