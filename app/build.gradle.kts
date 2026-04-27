@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.ktor.client.cio)
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
     implementation(libs.accompanist.permissions)
     debugImplementation(libs.androidx.ui.tooling)
 }
